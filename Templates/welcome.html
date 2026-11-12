@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedBox AI — Your Intelligent Medicine Companion</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .hero-icon {
+            font-size: 5rem;
+            margin-bottom: 16px;
+            display: inline-block;
+            animation: pulse 2s ease-in-out infinite, fadeInUp 0.8s ease;
+        }
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease 0.15s both;
+        }
+        .hero .tagline {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease 0.3s both;
+        }
+        .hero .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 40px;
+            background: var(--gradient-primary);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--radius-full);
+            font-size: 1.1rem;
+            font-weight: 700;
+            box-shadow: var(--shadow-glow-blue);
+            transition: all var(--transition-normal);
+            animation: fadeInUp 0.8s ease 0.45s both;
+        }
+        .cta-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 0 40px rgba(59,130,246,0.5), 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .features {
+            display: flex;
+            gap: 20px;
+            margin-top: 48px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+        .feature {
+            text-align: center;
+            padding: 16px;
+        }
+        .feature-icon {
+            font-size: 1.6rem;
+            margin-bottom: 6px;
+        }
+        .feature span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="animated-bg"></div>
+
+<div class="page-center">
+    <div class="hero">
+        <div class="hero-icon">🤖</div>
+        <h1 class="ai-text-gradient">MedBox AI</h1>
+        <p class="tagline">Your Intelligent AI Medication Assistant. Never miss a dose.</p>
+        <a href="/login_page" class="cta-btn">Get Started →</a>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">⏰</div>
+                <span>Smart Reminders</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <span>Track Doses</span>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">👨‍👩‍👧‍👦</div>
+                <span>Multi-Account</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — MedBox Alert</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 8px 14px;
+            border-radius: var(--radius-full);
+            transition: all var(--transition-normal);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border: none;
+            background: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.08);
+            color: var(--text-primary);
+        }
+
+        body.light .theme-toggle:hover {
+            background: rgba(0,0,0,0.04);
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .stat-chip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-chip strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body class="{{ theme }}">
+
+<!-- NAVBAR -->
+<nav class="navbar">
+
+    <div class="navbar-brand">
+        <span class="brand-icon">🤖</span>
+        <span class="ai-text-gradient" style="font-weight:800;">MedBox AI</span>
+    </div>
+
+    <div class="navbar-actions">
+
+        {% if accounts %}
+        <div class="dropdown">
+            <span class="nav-btn dropdown-toggle" onclick="toggleDropdown()">
+                👤 Accounts ▾
+            </span>
+
+            <div class="dropdown-menu" id="accountMenu">
+                {% for acc in accounts %}
+                    <a href="/switch/{{ acc }}">
+                        {% if acc == session.get('user') %}✓ {% endif %}{{ acc }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div style="display:flex;align-items:center;gap:10px;">
+            <a href="/dose_history" class="nav-btn" style="background:#444;padding:8px 12px;border-radius:8px;color:#fff;">📘 History</a>
+            <a href="/account_options" class="nav-btn">+ Add</a>
+            <span style="font-size:0.85rem;color:var(--text-secondary);">{{ last_taken_text }}</span>
+        </div>
+        <a href="/profile" class="nav-btn">👤 Profile</a>
+
+        <!-- LANGUAGE SELECTOR -->
+        <div class="dropdown">
+            <span class="nav-btn dropdown-toggle" onclick="toggleLangDropdown()">
+                🌐 Language ▾
+            </span>
+
+            <div class="dropdown-menu" id="langMenu">
+                <a href="/set_language/en">🇬🇧 English</a>
+                <a href="/set_language/hi">🇮🇳 Hindi</a>
+                <a href="/set_language/mr">🇮🇳 Marathi</a>
+            </div>
+        </div>
+
+        <a href="/chatbot" class="nav-btn ai-pulse"
+           style="color:var(--accent-cyan);font-weight:700;">
+           🤖 MedBot
+        </a>
+
+        <a href="/toggle_theme" class="theme-toggle">
+            {% if theme == 'dark' %}☀️{% else %}🌙{% endif %}
+        </a>
+
+        <a href="/logout" class="nav-btn nav-btn-logout">Logout</a>
+
+    </div>
+</nav>
+
+
+<div class="container">
+
+    <!-- WELCOME -->
+    <div class="welcome-section" style="animation:fadeInUp 0.5s ease;">
+        <h2>{{ texts.hello }}, {{ name }} 👋</h2>
+        <p>🌸 {{ texts.stay }}</p>
+    </div>
+
+
+    <!-- AI HEALTH INSIGHTS -->
+    <div class="med-card ai-card"
+         style="margin-bottom:28px;animation:fadeInUp 0.6s ease;background:rgba(168,85,247,0.05);">
+
+        <div class="med-card-header"
+             style="border-bottom:1px solid rgba(168,85,247,0.2);padding-bottom:12px;margin-bottom:12px;">
+
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:1.2rem;">🧠</span>
+                <h3 class="ai-text-gradient">AI Health Insights</h3>
+            </div>
+
+        </div>
+
+        <p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.5;">
+            <strong style="color:var(--accent-cyan);">Analysis Complete:</strong>
+            Your medication schedule is well-distributed.
+            <br>
+            💡 <strong style="color:var(--text-primary);">Tip:</strong>
+            Remember to drink a full glass of water with tablets to aid absorption.
+            If you have questions about side effects, ask MedBot!
+        </p>
+
+    </div>
+
+
+    {% if schedules %}
+    <div class="stats-bar" style="animation:fadeInUp 0.5s ease 0.1s both;">
+        <div class="stat-chip">
+            📋 <strong>{{ schedules|length }}</strong>
+            Medication{{ 's' if schedules|length != 1 }}
+        </div>
+    </div>
+    {% endif %}
+
+    <hr class="divider">
+
+
+    {% if schedules %}
+
+        {% for id, med in schedules.items() %}
+
+        <div class="med-card" style="animation-delay:{{ loop.index * 0.1 }}s;">
+
+            <div class="med-card-header">
+
+                <div class="med-icon
+                    {% if med.medicine_type == 'Syrup' %}
+                        med-icon-syrup
+                    {% else %}
+                        med-icon-tablet
+                    {% endif %}">
+
+                    {% if med.medicine_type == 'Syrup' %}
+                        🧴
+                    {% else %}
+                        💊
+                    {% endif %}
+
+                </div>
+
+                <div>
+                    <h3>{{ med.name }}</h3>
+
+                    <span class="badge
+                        {% if med.medicine_type == 'Syrup' %}
+                            badge-pink
+                        {% else %}
+                            badge-blue
+                        {% endif %}">
+                        {{ med.medicine_type or 'Tablet' }}
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="med-card-details">
+
+                <div class="med-detail">
+                    <strong>{{ texts.dose }}:</strong> {{ med.dose }}
+                </div>
+
+                {% if med.compartment %}
+                <div class="med-detail">
+                    <strong>Compartment Field:</strong> {{ med.compartment }}
+                </div>
+                {% endif %}
+
+                {% if med.compartments %}
+                <div class="med-detail">
+                    <strong>Compartments:</strong> {{ med.compartments | join(', ') }}
+                </div>
+                {% endif %}
+
+                <div class="med-detail">
+                    <strong>{{ texts.pills_left }}:</strong> {{ med.remaining_pills }}
+                </div>
+
+                {% if med.food %}
+                <div class="med-detail">
+                    <strong>{{ texts.food }}</strong>
+                </div>
+                {% endif %}
+
+            </div>
+
+
+            <div class="med-card-status" style="margin-top:10px;">
+                {% set ui = med.get('reminder_ui', {}) %}
+                {% if ui.state == 'pending' and ui.show_button %}
+                    <form method="post" action="/take_medicine/{{ id }}" style="display:flex;gap:8px;align-items:center;">
+                        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                            <input type="checkbox" name="taken_checkbox" onchange="this.form.submit();" style="width:18px;height:18px;cursor:pointer;" />
+                            <span style="font-size:0.85rem;">I took this dose</span>
+                        </label>
+                        <button type="submit" style="background:#10b981;border:none;color:#fff;padding:7px 10px;border-radius:8px;cursor:pointer;font-size:0.85rem;">Mark as taken</button>
+                        <span style="font-size:0.82rem;color:var(--text-secondary);">{{ ui.status_label }} ({{ ui.active_time }})</span>
+                    </form>
+                {% endif %}
+                {% if ui.state == 'taken' %}
+                    <div style="padding:8px 10px;border-radius:8px;background:#ecfdf3;color:#065f46;font-weight:600;display:inline-block;">✅ Taken at {{ ui.taken_at }}</div>
+                {% elif ui.state == 'missed' %}
+                    <div style="padding:8px 10px;border-radius:8px;background:#fef2f2;color:#991b1b;font-weight:600;display:inline-block;">⚠️ Missed</div>
+                {% else %}
+                    <div style="padding:8px 10px;border-radius:8px;background:#eef2ff;color:#3730a3;display:inline-block;">🕒 {{ ui.status_label }}</div>
+                {% endif %}
+            </div>
+
+            <div class="med-card-actions">
+                <a href="/edit_schedule/{{ id }}" class="action-edit">✏️ {{ texts.edit }}</a>
+                <a href="/delete_schedule/{{ id }}" class="action-delete">🗑️ {{ texts.delete }}</a>
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="empty-state" style="animation:fadeInUp 0.6s ease;">
+            <div class="empty-state-icon">📭</div>
+            <h3>{{ texts.no_meds }}</h3>
+            <p>{{ texts.add_first }}</p>
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<div class="dose-history" style="font-size:0.85rem;color:var(--text-secondary);margin-right:10px;">📘 {{ last_taken_text }}</div>
+        <a href="/add_schedule_page" class="fab" title="Add Medicine">+</a>
+
+
+<script>
+
+function toggleDropdown(){
+    var menu = document.getElementById("accountMenu");
+
+    if(menu.style.display === "block"){
+        menu.style.display = "none";
+    } else {
+        menu.style.display = "block";
+    }
+}
+
+function toggleLangDropdown(){
+    var menu = document.getElementById("langMenu");
+
+    if(menu.style.display === "block"){
+        menu.style.display = "none";
+    } else {
+        menu.style.display = "block";
+    }
+}
+
+window.onclick = function(event) {
+
+    if (!event.target.closest('.dropdown')) {
+
+        var menu = document.getElementById("accountMenu");
+        var lang = document.getElementById("langMenu");
+
+        if(menu){ menu.style.display = "none"; }
+        if(lang){ lang.style.display = "none"; }
+
+    }
+}
+
+</script>
+
+</body>
+</html>

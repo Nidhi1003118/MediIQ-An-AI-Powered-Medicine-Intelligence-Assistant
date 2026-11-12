@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP — MedBox Alert</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        #otp {
+            text-align: center;
+            font-size: 1.6rem;
+            letter-spacing: 12px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<div class="animated-bg"></div>
+
+<div class="page-center">
+    <div class="card">
+
+        <div class="page-icon">📱</div>
+        <h2 class="page-title">Verify OTP</h2>
+        <p class="page-subtitle">Enter the 4-digit code sent to your phone</p>
+
+        <form method="POST" action="/verify_otp">
+            <div class="form-group">
+                <input type="text" id="otp" name="otp" class="input-field"
+                       placeholder="● ● ● ●" maxlength="4" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Verify</button>
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>

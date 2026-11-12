@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up — MedBox Alert</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .signup-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 16px;
+        }
+        .signup-grid .full-width {
+            grid-column: 1 / -1;
+        }
+        @media (max-width: 500px) {
+            .signup-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="animated-bg"></div>
+
+<div class="page-center">
+    <div class="card card-wide">
+
+        <div class="page-icon">📋</div>
+        <h2 class="page-title">Create Account</h2>
+        <p class="page-subtitle">Join MedBox to manage your medications</p>
+
+        <form method="POST" action="/signup">
+
+            <div class="signup-grid">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" class="input-field" placeholder="John Doe" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" class="input-field" placeholder="johndoe" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" class="input-field" placeholder="john@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="text" id="phone" name="phone" class="input-field" placeholder="9876543210" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" name="dob" class="input-field" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="blood_group">Blood Group</label>
+                    <select id="blood_group" name="blood_group" class="input-field" required>
+                        <option value="">Select Blood Group</option>
+                        <option>A+</option>
+                        <option>A-</option>
+                        <option>B+</option>
+                        <option>B-</option>
+                        <option>O+</option>
+                        <option>O-</option>
+                        <option>AB+</option>
+                        <option>AB-</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="disease">Medical Condition</label>
+                    <input type="text" id="disease" name="disease" class="input-field" placeholder="e.g. Diabetes, Hypertension" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" class="input-field" placeholder="Create password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" class="input-field" placeholder="Confirm password" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 8px;">Create Account</button>
+        </form>
+
+        <div style="text-align:center; margin-top: 20px;">
+            <a href="/login_page" class="link">Already have an account? Sign In</a>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

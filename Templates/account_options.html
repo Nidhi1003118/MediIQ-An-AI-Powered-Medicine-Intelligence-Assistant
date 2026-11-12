@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Account — MedBox Alert</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .option-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-top: 8px;
+        }
+        .option-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 20px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all var(--transition-normal);
+            border: 1px solid var(--glass-border);
+            background: var(--glass-bg);
+        }
+        .option-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .option-card-login:hover {
+            border-color: rgba(6, 182, 212, 0.3);
+            background: rgba(6, 182, 212, 0.08);
+        }
+        .option-card-signup:hover {
+            border-color: rgba(236, 72, 153, 0.3);
+            background: rgba(236, 72, 153, 0.08);
+        }
+        .option-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .option-icon-login {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(59, 130, 246, 0.2));
+        }
+        .option-icon-signup {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(245, 158, 11, 0.2));
+        }
+        .option-text h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .option-text p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+<div class="animated-bg"></div>
+
+<div class="page-center">
+    <div class="card">
+
+        <div class="page-icon">👤</div>
+        <h2 class="page-title">Add Account</h2>
+        <p class="page-subtitle">Link another account to switch between</p>
+
+        <div class="option-cards">
+            <a href="/login_page?add=true" class="option-card option-card-login">
+                <div class="option-icon option-icon-login">🔑</div>
+                <div class="option-text">
+                    <h3>Login</h3>
+                    <p>Already have an account</p>
+                </div>
+            </a>
+
+            <a href="/signup_page?add=true" class="option-card option-card-signup">
+                <div class="option-icon option-icon-signup">✨</div>
+                <div class="option-text">
+                    <h3>Sign Up</h3>
+                    <p>Create a new account</p>
+                </div>
+            </a>
+        </div>
+
+        <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+
+    </div>
+</div>
+
+</body>
+</html>

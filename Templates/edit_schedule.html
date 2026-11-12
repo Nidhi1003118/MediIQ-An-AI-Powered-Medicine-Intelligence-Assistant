@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ texts.edit }} — MedBox Alert</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="animated-bg"></div>
+
+<div class="page-center">
+    <div class="card card-wide">
+
+        <div class="page-icon">✏️</div>
+        <h2 class="page-title">{{ texts.edit }} {{ texts.add_med }}</h2>
+        <p class="page-subtitle">Update the details for your medication</p>
+
+        <form method="POST" action="/update_schedule/{{ sid }}">
+
+            <p class="form-section-title">💊 {{ texts.add_med }}</p>
+
+            <div class="form-group">
+                <label for="name">{{ texts.name }}</label>
+                <input type="text" id="name" name="name" class="input-field" value="{{ med['name'] }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="dose">{{ texts.dose }}</label>
+                <input type="text" id="dose" name="dose" class="input-field" value="{{ med['dose'] }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="medicine_type">Medicine Type</label>
+                <select id="medicine_type" name="medicine_type" class="input-field" onchange="setCompartmentOptions()" required>
+                    <option value="Tablet" {% if med['medicine_type']=="Tablet" %}selected{% endif %}>Tablet</option>
+                    <option value="Syrup" {% if med['medicine_type']=="Syrup" %}selected{% endif %}>Syrup</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="total_pills">{{ texts.total_pills }}</label>
+                <input type="number" id="total_pills" name="total_pills" class="input-field" value="{{ med['total_pills'] }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="compartment">Compartment</label>
+                <select id="compartment" name="compartment" class="input-field" required>
+                    <option value="">Choose one</option>
+                </select>
+            </div>
+
+            <hr class="divider">
+            <p class="form-section-title">📅 Schedule</p>
+
+            <div class="form-group">
+                <label for="start">Start Date</label>
+                <input type="date" id="start" name="start" class="input-field" value="{{ med['start'] }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="end">End Date</label>
+                <input type="date" id="end" name="end" class="input-field" value="{{ med['end'] }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="expiry">Expiry Date</label>
+                <input type="date" id="expiry" name="expiry" class="input-field" value="{{ med['expiry'] }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="food">Food Instruction</label>
+                <select id="food" name="food" class="input-field">
+                    <option value="Before Food" {% if med['food']=="Before Food" %}selected{% endif %}>Before Food</option>
+                    <option value="After Food" {% if med['food']=="After Food" %}selected{% endif %}>After Food</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="frequency">Frequency</label>
+                <select id="frequency" name="frequency" class="input-field">
+                    <option value="Daily" {% if med['frequency']=="Daily" %}selected{% endif %}>Daily</option>
+                    <option value="Weekly" {% if med['frequency']=="Weekly" %}selected{% endif %}>Weekly</option>
+                </select>
+            </div>
+
+            <hr class="divider">
+            <p class="form-section-title">⏰ Timing</p>
+
+            <div class="form-group">
+                <label for="times_count">How many times a day?</label>
+                <select id="times_count" name="times_count" class="input-field" onchange="generateTimeFields()">
+                    {% for i in range(1,6) %}
+                        <option value="{{ i }}" {% if med['times']|length == i %}selected{% endif %}>{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="time_fields"></div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 8px;">
+                {{ texts.save }}
+            </button>
+        </form>
+
+        <a href="/dashboard" class="back-link">← {{ texts.dashboard }}</a>
+
+    </div>
+</div>
+
+<script>
+function generateTimeFields(){
+    const count = document.getElementById("times_count").value;
+    const container = document.getElementById("time_fields");
+    container.innerHTML = "";
+
+    const existingTimes = {{ med['times'] | tojson | safe }};
+
+    for(let i=1; i<=count; i++){
+        let hourSelected = "";
+        let minuteSelected = "";
+        let ampmSelected = "";
+
+        if(existingTimes[i-1]){
+            const parts = existingTimes[i-1].split(" ");
+            const timeParts = parts[0].split(":");
+            hourSelected = timeParts[0];
+            minuteSelected = timeParts[1];
+            ampmSelected = parts[1];
+        }
+
+        let hourOptions = "";
+        for(let h=1; h<=12; h++){
+            hourOptions += `<option value="${h}" ${h==hourSelected ? "selected":""}>${h}</option>`;
+        }
+
+        let minuteOptions = "";
+        for(let m=0; m<60; m++){
+            let mm = m<10 ? "0"+m : m;
+            minuteOptions += `<option value="${mm}" ${mm==minuteSelected ? "selected":""}>${mm}</option>`;
+        }
+
+        container.innerHTML += `
+            <div class="form-group" style="animation: fadeInUp 0.3s ease ${i * 0.1}s both;">
+                <label>Time ${i}</label>
+                <div class="time-row">
+                    <select name="hour${i}" class="input-field" required>${hourOptions}</select>
+                    <select name="minute${i}" class="input-field" required>${minuteOptions}</select>
+                    <select name="ampm${i}" class="input-field" required>
+                        <option value="AM" ${ampmSelected=="AM"?"selected":""}>AM</option>
+                        <option value="PM" ${ampmSelected=="PM"?"selected":""}>PM</option>
+                    </select>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function setCompartmentOptions(){
+    const type = document.getElementById('medicine_type').value;
+    const compartment = document.getElementById('compartment');
+    const current = "{{ med.get('compartment','') }}";
+    compartment.innerHTML = '<option value="">Choose one</option>';
+
+    if(type === 'Tablet'){
+        ['Compartment 1','Compartment 2','Compartment 3','Compartment 4','Compartment 5'].forEach(opt => {
+            const el = document.createElement('option');
+            el.value = opt;
+            el.textContent = opt;
+            if(opt === current) el.selected = true;
+            compartment.appendChild(el);
+        });
+    } else if(type === 'Syrup'){
+        const opt = document.createElement('option');
+        opt.value = 'Compartment 1';
+        opt.textContent = 'Compartment 1';
+        if(current === 'Compartment 1') opt.selected = true;
+        compartment.appendChild(opt);
+    }
+}
+
+window.onload = function(){
+    generateTimeFields();
+    setCompartmentOptions();
+}
+</script>
+
+</body>
+</html>

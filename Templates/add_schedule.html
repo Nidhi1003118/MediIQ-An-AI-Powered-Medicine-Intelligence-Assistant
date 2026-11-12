@@ -1,0 +1,264 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ texts.add_med }} — MedBox Alert</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="animated-bg"></div>
+
+    <div class="page-center">
+        <div class="card card-wide">
+
+            <div class="page-icon">➕</div>
+
+            <h2 class="page-title">{{ texts.add_med }}</h2>
+            <p class="page-subtitle">{{ texts.fill_details }}</p>
+
+            <form method="POST" action="/add_schedule">
+
+                <p class="form-section-title">💊 {{ texts.add_med }}</p>
+
+                <div class="form-group">
+                    <label for="name">{{ texts.name }}</label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        class="input-field"
+                        placeholder="e.g. Paracetamol"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="dose">{{ texts.dose }}</label>
+
+                    <input
+                        type="text"
+                        id="dose"
+                        name="dose"
+                        class="input-field"
+                        placeholder="e.g. 500mg"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="medicine_type">{{ texts.medicine_type }}</label>
+
+                    <select
+                        id="medicine_type"
+                        name="medicine_type"
+                        class="input-field"
+                        onchange="setCompartmentOptions()"
+                        required>
+
+                        <option value="">{{ texts.select_type }}</option>
+                        <option value="Tablet">{{ texts.tablet }}</option>
+                        <option value="Syrup">{{ texts.syrup }}</option>
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="total_pills">{{ texts.total_pills }}</label>
+
+                    <input
+                        type="number"
+                        id="total_pills"
+                        name="total_pills"
+                        class="input-field"
+                        placeholder="e.g. 30"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="compartment">Compartment</label>
+                    <select id="compartment" name="compartment" class="input-field" required>
+                        <option value="">Choose one</option>
+                    </select>
+                </div>
+
+                <hr class="divider">
+
+                <p class="form-section-title">📅 {{ texts.schedule }}</p>
+
+                <div class="form-group">
+                    <label for="start">{{ texts.start_date }}</label>
+
+                    <input
+                        type="date"
+                        id="start"
+                        name="start"
+                        class="input-field"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="end">{{ texts.end_date }}</label>
+
+                    <input
+                        type="date"
+                        id="end"
+                        name="end"
+                        class="input-field"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="expiry">{{ texts.expiry_date }}</label>
+
+                    <input
+                        type="date"
+                        id="expiry"
+                        name="expiry"
+                        class="input-field"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="food">{{ texts.food_instruction }}</label>
+
+                    <select
+                        id="food"
+                        name="food"
+                        class="input-field">
+
+                        <option value="Before Food">{{ texts.before_food }}</option>
+                        <option value="After Food">{{ texts.after_food }}</option>
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="frequency">{{ texts.frequency }}</label>
+
+                    <select
+                        id="frequency"
+                        name="frequency"
+                        class="input-field">
+
+                        <option value="Daily">{{ texts.daily }}</option>
+                        <option value="Weekly">{{ texts.weekly }}</option>
+
+                    </select>
+                </div>
+
+                <hr class="divider">
+
+                <p class="form-section-title">⏰ {{ texts.timing }}</p>
+
+                <div class="form-group">
+                    <label for="times_count">{{ texts.times_day }}</label>
+
+                    <select
+                        id="times_count"
+                        name="times_count"
+                        class="input-field"
+                        onchange="generateTimeFields()"
+                        required>
+
+                        <option value="">{{ texts.select_type }}</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+
+                    </select>
+                </div>
+
+                <div id="time_fields"></div>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    style="margin-top: 8px;">
+
+                    {{ texts.save }}
+
+                </button>
+
+            </form>
+
+            <a href="/dashboard" class="back-link">
+                ← {{ texts.dashboard }}
+            </a>
+
+        </div>
+    </div>
+
+<script>
+
+function generateTimeFields() {
+
+    let count = document.getElementById("times_count").value;
+    let container = document.getElementById("time_fields");
+
+    container.innerHTML = "";
+
+    for (let i = 1; i <= count; i++) {
+
+        container.innerHTML += `
+            <div class="form-group">
+
+                <label>Time ${i}</label>
+
+                <div class="time-row">
+
+                    <select name="hour${i}" class="input-field" required>
+                        ${Array.from({length:12},(_,k)=>`<option value="${k+1}">${k+1}</option>`).join("")}
+                    </select>
+
+                    <select name="minute${i}" class="input-field" required>
+                        ${Array.from({length:60},(_,k)=>`<option value="${k.toString().padStart(2,'0')}">${k.toString().padStart(2,'0')}</option>`).join("")}
+                    </select>
+
+                    <select name="ampm${i}" class="input-field" required>
+                        <option value="AM">AM</option>
+                        <option value="PM">PM</option>
+                    </select>
+
+                </div>
+
+            </div>
+        `;
+    }
+
+}
+
+function setCompartmentOptions() {
+    const medType = document.getElementById('medicine_type').value;
+    const comp = document.getElementById('compartment');
+    const options = [];
+
+    if (medType === 'Tablet') {
+        options.push('Compartment 1', 'Compartment 2', 'Compartment 3', 'Compartment 4', 'Compartment 5');
+    } else if (medType === 'Syrup') {
+        options.push('Compartment 1');
+    }
+
+    comp.innerHTML = '<option value="">Choose one</option>';
+    options.forEach(opt => {
+        const el = document.createElement('option');
+        el.value = opt;
+        el.textContent = opt;
+        comp.appendChild(el);
+    });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    setCompartmentOptions();
+});
+</script>
+
+</body>
+</html>
+```

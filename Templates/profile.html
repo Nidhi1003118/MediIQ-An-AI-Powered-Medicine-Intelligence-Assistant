@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile — MedBox Alert</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .profile-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 16px;
+            box-shadow: var(--shadow-glow-blue);
+        }
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        .profile-phone {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .info-item {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            transition: all var(--transition-normal);
+        }
+        .info-item:hover {
+            border-color: rgba(255,255,255,0.15);
+        }
+        .info-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .full-span {
+            grid-column: 1 / -1;
+        }
+        .edit-form { display: none; }
+        .edit-form.active { display: block; }
+        .view-mode.hidden { display: none; }
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .btn-row .btn { flex: 1; }
+        @media (max-width: 500px) {
+            .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="animated-bg"></div>
+
+<div class="page-center">
+    <div class="card card-wide">
+
+        <!-- VIEW MODE -->
+        <div class="view-mode" id="viewMode">
+            <div class="profile-header">
+                <div class="avatar">{{ user.name[0] | upper if user.name else '?' }}</div>
+                <div class="profile-name">{{ user.name or 'User' }}</div>
+                <div class="profile-phone">📱 {{ phone }}</div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Username</div>
+                    <div class="info-value">{{ user.username or '—' }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div class="info-value">{{ user.email or '—' }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Date of Birth</div>
+                    <div class="info-value">{{ user.dob or '—' }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Blood Group</div>
+                    <div class="info-value">{{ user.blood_group or '—' }}</div>
+                </div>
+                <div class="info-item full-span">
+                    <div class="info-label">Medical Condition</div>
+                    <div class="info-value">{{ user.disease or '—' }}</div>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="toggleEdit()">✏️ Edit Profile</button>
+                <a href="/dashboard" class="btn btn-secondary">← Dashboard</a>
+            </div>
+        </div>
+
+        <!-- EDIT MODE -->
+        <div class="edit-form" id="editMode">
+            <div class="page-icon">✏️</div>
+            <h2 class="page-title">Edit Profile</h2>
+            <p class="page-subtitle">Update your personal information</p>
+
+            <form method="POST" action="/update_profile">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" class="input-field" value="{{ user.name or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" class="input-field" value="{{ user.username or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" class="input-field" value="{{ user.email or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" name="dob" class="input-field" value="{{ user.dob or '' }}">
+                </div>
+                <div class="form-group">
+                    <label for="blood_group">Blood Group</label>
+                    <select id="blood_group" name="blood_group" class="input-field">
+                        <option value="">Select</option>
+                        {% for bg in ['A+','A-','B+','B-','O+','O-','AB+','AB-'] %}
+                        <option value="{{ bg }}" {% if user.blood_group == bg %}selected{% endif %}>{{ bg }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="disease">Medical Condition</label>
+                    <input type="text" id="disease" name="disease" class="input-field" value="{{ user.disease or '' }}">
+                </div>
+
+                <div class="btn-row">
+                    <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="toggleEdit()">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function toggleEdit() {
+    document.getElementById('viewMode').classList.toggle('hidden');
+    document.getElementById('editMode').classList.toggle('active');
+}
+</script>
+
+</body>
+</html>
